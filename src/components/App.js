@@ -64,11 +64,11 @@ function App() {
 
   return (
     <Section $active={ pasteBoxActive }>
-      <UploadButton $active={ pasteBoxActive }>
+      {/* <UploadButton $active={ pasteBoxActive }>
         Upload package.json
         <Upload type="file" accept="application/json" onChange={ (event) => parseFileData(event.target.files[0]) } />
       </UploadButton>
-      <Text>Or</Text>
+      <Text>Or</Text> */}
       <PasteButton $active={ pasteBoxActive } onClick={ () => setPasteBoxActive(true) }>Copy Paste package.json</PasteButton>
       <Label>
         <Checkbox
