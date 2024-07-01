@@ -147,9 +147,18 @@ const StyledThCellOne = styled.span`
   top: -3px;
 `;
 
+const StickySubHead = styled(Tcell)`
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10 !important;
+  top: 63px;
+`;
+
 export {
   Section,
   StickyHead,
+  StickySubHead,
   StyledAsc,
   StyledDsc,
   StyledThCellOne,

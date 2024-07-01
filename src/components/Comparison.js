@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import {
   Section,
   StickyHead,
+  StickySubHead,
   StyledAsc,
   StyledDsc,
   StyledThCellOne,
@@ -88,30 +89,40 @@ function Comparison() {
 
     if (trackerStatus) {
       for (let item in pkgData.devDependencies) {
-        const endpoint = `https://registry.npmjs.org/${item}`;
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        const versions = data.versions;
-        const versionsData = Object.values(versions);
-        let latestVersion = versionsData.pop();
+        try {
+          const endpoint = `https://registry.npmjs.org/${item}`;
+          const res = await fetch(endpoint);
+          const data = await res.json();
+          const versions = data.versions;
+          const versionsData = Object.values(versions);
+          let latestVersion = versionsData.pop();
 
-        if (latestVersion.version.includes("-")) {
-          for (let i = versionsData.length - 1; i > 0; i--) {
-            if (!versionsData[i].version.includes("-")) {
-              latestVersion = versionsData[i];
-              break;
+          if (latestVersion.version.includes("-")) {
+            for (let i = versionsData.length - 1; i > 0; i--) {
+              if (!versionsData[i].version.includes("-")) {
+                latestVersion = versionsData[i];
+                break;
+              }
             }
           }
-        }
 
-        setComparisonDataD((prevData) => ({
-          ...prevData,
-          [latestVersion.name]: {
-            ...prevData[latestVersion.name],
-            pkgNewVer: latestVersion.version,
-            pkgDependencies: latestVersion.dependencies,
-          },
-        }));
+          setComparisonDataD((prevData) => ({
+            ...prevData,
+            [latestVersion.name]: {
+              ...prevData[latestVersion.name],
+              pkgNewVer: latestVersion.version,
+              pkgDependencies: latestVersion.dependencies,
+            },
+          }));
+        } catch (error) {
+          setComparisonData((prevData) => ({
+            ...prevData,
+            [item]: {
+              pkgNewVer: prevData[item].pkgCurrVer,
+              pkgCurrVer: prevData[item].pkgCurrVer,
+            },
+          }));
+        }
       }
     }
   };
@@ -147,17 +158,30 @@ function Comparison() {
     setLoadStatus(true);
   };
 
-  const sort = (e) => {
-    const updateSort = sorted
+  const sort = () => {
+    const updateSortDependencies = sorted
       ? Object.keys(comparisonData).sort()
       : Object.keys(comparisonData).sort().reverse();
 
-    const sortedVal = updateSort.reduce((obj, key) => {
+    const sortedDependencies = updateSortDependencies.reduce((obj, key) => {
       obj[key] = comparisonData[key];
       return obj;
     }, {});
 
-    setComparisonData(sortedVal);
+    setComparisonData(sortedDependencies);
+
+    if (trackerStatus) {
+      const updateSortDevDependencies = sorted
+        ? Object.keys(comparisonDataD).sort()
+        : Object.keys(comparisonDataD).sort().reverse();
+
+      const sortedDevDependencies = updateSortDevDependencies.reduce((obj, key) => {
+        obj[key] = comparisonDataD[key];
+        return obj;
+      }, {});
+
+      setComparisonDataD(sortedDevDependencies);
+    }
     setToggleSort(!sorted);
   };
   useEffect(() => {
@@ -186,9 +210,9 @@ function Comparison() {
           <tbody>
             {trackerStatus ? (
               <Trow>
-                <Tcell colSpan="3" $collapse={trackerStatus}>
+                <StickySubHead colSpan="3" $collapse={trackerStatus}>
                   Dependencies
-                </Tcell>
+                </StickySubHead>
               </Trow>
             ) : null}
             {comparisonData &&
@@ -222,9 +246,9 @@ function Comparison() {
               })}
             {trackerStatus ? (
               <Trow>
-                <Tcell colSpan="3" $collapse={trackerStatus}>
+                <StickySubHead colSpan="3" $collapse={trackerStatus}>
                   Dev Dependencies
-                </Tcell>
+                </StickySubHead>
               </Trow>
             ) : null}
             {comparisonDataD &&
