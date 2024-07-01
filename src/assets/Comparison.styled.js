@@ -2,6 +2,11 @@ import { styled } from "styled-components";
 
 import { colors } from "../utils/constants";
 
+import {
+  AiOutlineSortAscending,
+  AiOutlineSortDescending,
+} from "react-icons/ai";
+
 const Section = styled.section`
   display: flex;
   flex-direction: column;
@@ -125,12 +130,30 @@ const StickyHead = styled.thead`
   position: sticky;
   top: 0;
   background-color: white;
+  border: 1px solid black
   z-index: 1;
 `;
 
+const StyledAsc = styled(AiOutlineSortAscending)`
+  margin-right: 0.4rem;
+  font-size: 20px;
+`;
+const StyledDsc = styled(AiOutlineSortDescending)`
+  margin-right: 0.4rem;
+  font-size: 20px;
+`;
+
+const StyledThCellOne = styled.span`
+  position: relative;
+  top: -3px;
+`;
+
 export {
-  StickyHead,
   Section,
+  StickyHead,
+  StyledAsc,
+  StyledDsc,
+  StyledThCellOne,
   TableWrapper,
   Table,
   Trow,

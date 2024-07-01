@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 import {
-  StickyHead,
   Section,
+  StickyHead,
+  StyledAsc,
+  StyledDsc,
+  StyledThCellOne,
   TableWrapper,
   Table,
   Trow,
@@ -16,6 +19,7 @@ import {
 
 function Comparison() {
   const location = useLocation();
+  const [sorted, setToggleSort] = useState(false);
   const [pkgData, setPkgData] = useState(JSON.parse(location.state.fileData));
   const [trackerStatus, setTrackerStatus] = useState(
     JSON.parse(location.state.trackerStatus)
@@ -143,6 +147,19 @@ function Comparison() {
     setLoadStatus(true);
   };
 
+  const sort = (e) => {
+    const updateSort = sorted
+      ? Object.keys(comparisonData).sort()
+      : Object.keys(comparisonData).sort().reverse();
+
+    const sortedVal = updateSort.reduce((obj, key) => {
+      obj[key] = comparisonData[key];
+      return obj;
+    }, {});
+
+    setComparisonData(sortedVal);
+    setToggleSort(!sorted);
+  };
   useEffect(() => {
     loadExistingData();
   }, [pkgData]);
@@ -157,7 +174,10 @@ function Comparison() {
         <Table>
           <StickyHead>
             <Trow>
-              <Theader>Package Name</Theader>
+              <Theader id="name" onClick={sort}>
+                {sorted ? <StyledDsc /> : <StyledAsc />}
+                <StyledThCellOne>Package Name</StyledThCellOne>
+              </Theader>
               <Theader>Current Version</Theader>
               <Theader>Latest Version</Theader>
               {/*<Theader>Dependencies</Theader>*/}
