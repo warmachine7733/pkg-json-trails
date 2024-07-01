@@ -130,8 +130,7 @@ const StickyHead = styled.thead`
   position: sticky;
   top: 0;
   background-color: white;
-  border: 1px solid black
-  z-index: 1;
+  z-index: 10 !important;
 `;
 
 const StyledAsc = styled(AiOutlineSortAscending)`
