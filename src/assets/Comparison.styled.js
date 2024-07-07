@@ -82,7 +82,7 @@ const LegendsItem = styled.li`
   position: relative;
   font-size: 0.875rem;
   color: ${colors.darkerGray};
-
+  cursor: pointer;
   &:nth-child(n) {
     &:before {
       content: "";
