@@ -17,7 +17,8 @@ const Section = styled.section`
 
 const TableWrapper = styled.div`
   height: 65vh;
-  overflow-x: scroll;
+  overflow-y: scroll;
+  background-color: white;
 `;
 
 const Table = styled.table`
@@ -99,6 +100,9 @@ const LegendsItem = styled.li`
     &:before {
       background-color: ${colors.primary};
     }
+    &:checked {
+      border: 1px solid;
+    }
   }
 
   &:nth-child(2) {
@@ -122,6 +126,13 @@ const LegendsItem = styled.li`
 
     &:before {
       background-color: ${colors.red};
+    }
+  }
+  &:nth-child(5) {
+    color: ${colors.gray};
+
+    &:before {
+      background-color: ${colors.gray};
     }
   }
 `;

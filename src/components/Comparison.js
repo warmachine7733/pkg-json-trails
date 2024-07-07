@@ -1,26 +1,16 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-import {
-  Section,
-  StickyHead,
-  StickySubHead,
-  StyledAsc,
-  StyledDsc,
-  StyledThCellOne,
-  TableWrapper,
-  Table,
-  Trow,
-  Theader,
-  Tcell,
-  Loader,
-  Legends,
-  LegendsItem,
-} from "../assets/Comparison.styled";
+import { Section } from "../assets/Comparison.styled";
+import { versionComparison } from "../utils/versionComparision";
+import { VersionInfo } from "./VersionInfo";
+import { TableData } from "./TableData";
+import { fetchPackageDetails } from "../utils/fetchPackageDetails";
+import { sortAlpha } from "../utils/sortAlpha";
 
 function Comparison() {
   const location = useLocation();
-  const [sorted, setToggleSort] = useState(false);
+  const [sortedAlpha, setToggleAlphaSort] = useState(false);
   const [pkgData, setPkgData] = useState(JSON.parse(location.state.fileData));
   const [trackerStatus, setTrackerStatus] = useState(
     JSON.parse(location.state.trackerStatus)
@@ -28,104 +18,10 @@ function Comparison() {
   const [loadStatus, setLoadStatus] = useState(false);
   const [comparisonData, setComparisonData] = useState(null);
   const [comparisonDataD, setComparisonDataD] = useState(null);
-
-  const versionComparison = (curr, latest) => {
-    let color = null;
-    let str = curr;
-    if (curr.charAt(0) === "^") {
-      str = str.substring(1, str.length);
-    }
-    const currVerCat = str.split(".");
-    const latestVerCat = latest.split(".");
-    if (parseInt(currVerCat[0]) < parseInt(latestVerCat[0])) {
-      color = "red";
-    } else if (parseInt(currVerCat[1]) < parseInt(latestVerCat[1])) {
-      color = "orange";
-    } else if (parseInt(currVerCat[2]) < parseInt(latestVerCat[2])) {
-      color = "yellow";
-    } else {
-      color = "primary";
-    }
-    return color;
-  };
-
-  const getLatestVersions = async () => {
-    for (let item in pkgData.dependencies) {
-      try {
-        const endpoint = `https://registry.npmjs.org/${item}`;
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        const versions = data.versions;
-        const versionsData = Object.values(versions);
-        let latestVersion = versionsData.pop();
-
-        if (latestVersion.version.includes("-")) {
-          for (let i = versionsData.length - 1; i > 0; i--) {
-            if (!versionsData[i].version.includes("-")) {
-              latestVersion = versionsData[i];
-              break;
-            }
-          }
-        }
-
-        setComparisonData((prevData) => ({
-          ...prevData,
-          [latestVersion.name]: {
-            ...prevData[latestVersion.name],
-            pkgNewVer: latestVersion.version,
-            pkgDependencies: latestVersion.dependencies,
-          },
-        }));
-      } catch (error) {
-        setComparisonData((prevData) => ({
-          ...prevData,
-          [item]: {
-            pkgNewVer: prevData[item].pkgCurrVer,
-            pkgCurrVer: prevData[item].pkgCurrVer,
-          },
-        }));
-      }
-    }
-
-    if (trackerStatus) {
-      for (let item in pkgData.devDependencies) {
-        try {
-          const endpoint = `https://registry.npmjs.org/${item}`;
-          const res = await fetch(endpoint);
-          const data = await res.json();
-          const versions = data.versions;
-          const versionsData = Object.values(versions);
-          let latestVersion = versionsData.pop();
-
-          if (latestVersion.version.includes("-")) {
-            for (let i = versionsData.length - 1; i > 0; i--) {
-              if (!versionsData[i].version.includes("-")) {
-                latestVersion = versionsData[i];
-                break;
-              }
-            }
-          }
-
-          setComparisonDataD((prevData) => ({
-            ...prevData,
-            [latestVersion.name]: {
-              ...prevData[latestVersion.name],
-              pkgNewVer: latestVersion.version,
-              pkgDependencies: latestVersion.dependencies,
-            },
-          }));
-        } catch (error) {
-          setComparisonData((prevData) => ({
-            ...prevData,
-            [item]: {
-              pkgNewVer: prevData[item].pkgCurrVer,
-              pkgCurrVer: prevData[item].pkgCurrVer,
-            },
-          }));
-        }
-      }
-    }
-  };
+  const [filteredData, setFilteredData] = useState(null);
+  const [filteredDataDev, setFilteredDataDev] = useState(null);
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [isFilteredDev, setIsFilteredDev] = useState(false);
 
   const loadExistingData = () => {
     let mappedData = {};
@@ -158,137 +54,83 @@ function Comparison() {
     setLoadStatus(true);
   };
 
-  const sort = () => {
-    const updateSortDependencies = sorted
-      ? Object.keys(comparisonData).sort()
-      : Object.keys(comparisonData).sort().reverse();
-
-    const sortedDependencies = updateSortDependencies.reduce((obj, key) => {
-      obj[key] = comparisonData[key];
-      return obj;
-    }, {});
-
-    setComparisonData(sortedDependencies);
-
-    if (trackerStatus) {
-      const updateSortDevDependencies = sorted
-        ? Object.keys(comparisonDataD).sort()
-        : Object.keys(comparisonDataD).sort().reverse();
-
-      const sortedDevDependencies = updateSortDevDependencies.reduce((obj, key) => {
-        obj[key] = comparisonDataD[key];
-        return obj;
-      }, {});
-
-      setComparisonDataD(sortedDevDependencies);
+  const filterByVersion = (e) => {
+    const versionsType = ["Major", "Minor", "Patch", "Latest"];
+    if (e.target.innerText === "All") {
+      setFilteredData(comparisonData);
+      setIsFiltered(false);
+    } else if (versionsType.includes(e.target.innerText)) {
+      const filtered = Object.values(comparisonData)
+        .filter((each) => each.versionDetails.value === e.target.innerText)
+        .reduce((obj, key) => {
+          return {
+            ...obj,
+            [key.pkgName]: key,
+          };
+        }, {});
+      setFilteredData(filtered);
+      setIsFiltered(filtered ? true : false);
     }
-    setToggleSort(!sorted);
+    if (trackerStatus) {
+      if (e.target.innerText === "All") {
+        setFilteredDataDev(comparisonData);
+        setIsFilteredDev(false);
+      } else {
+        const filteredDev = Object.values(comparisonDataD)
+          .filter((each) => each.versionDetails.value === e.target.innerText)
+          .reduce((obj, key) => {
+            return {
+              ...obj,
+              [key.pkgName]: key,
+            };
+          }, {});
+        setFilteredDataDev(filteredDev);
+        setIsFilteredDev(filteredDev ? true : false);
+      }
+    }
   };
+
   useEffect(() => {
     loadExistingData();
   }, [pkgData]);
 
   useEffect(() => {
-    getLatestVersions();
-  }, [loadStatus]);
+    fetchPackageDetails({
+      pkgData,
+      setComparisonData,
+      setComparisonDataD,
+      trackerStatus,
+      versionComparison,
+    });
+  }, [trackerStatus]);
+
+  const calculatedDepData =
+    isFiltered && filteredData ? filteredData : comparisonData;
+
+  const calculatedDevDepData =
+    isFilteredDev && filteredDataDev ? filteredDataDev : comparisonDataD;
 
   return (
     <Section>
-      <TableWrapper>
-        <Table>
-          <StickyHead>
-            <Trow>
-              <Theader id="name" onClick={sort}>
-                {sorted ? <StyledDsc /> : <StyledAsc />}
-                <StyledThCellOne>Package Name</StyledThCellOne>
-              </Theader>
-              <Theader>Current Version</Theader>
-              <Theader>Latest Version</Theader>
-              {/*<Theader>Dependencies</Theader>*/}
-            </Trow>
-          </StickyHead>
-          <tbody>
-            {trackerStatus ? (
-              <Trow>
-                <StickySubHead colSpan="3" $collapse={trackerStatus}>
-                  Dependencies
-                </StickySubHead>
-              </Trow>
-            ) : null}
-            {comparisonData &&
-              Object.values(comparisonData).map((item, index) => {
-                return (
-                  <Trow key={`tr_${index}`}>
-                    <Tcell>{Object.keys(comparisonData)[index]}</Tcell>
-                    <Tcell
-                      $active={
-                        item.pkgNewVer
-                          ? versionComparison(item.pkgCurrVer, item.pkgNewVer)
-                          : ""
-                      }
-                    >
-                      {item.pkgCurrVer}
-                    </Tcell>
-                    <Tcell>
-                      {item.pkgNewVer ? item.pkgNewVer : <Loader></Loader>}
-                    </Tcell>
-                    {/*<Tcell>
-				  			  		{
-				  			  			item.pkgDependencies && Object.keys(item.pkgDependencies).map((item2, index2) => {
-				  			  				return (
-				  			  					<span>{ item2 }</span>
-				  			  				)
-				  							})
-				  			  		}
-				  			  	</Tcell>*/}
-                  </Trow>
-                );
-              })}
-            {trackerStatus ? (
-              <Trow>
-                <StickySubHead colSpan="3" $collapse={trackerStatus}>
-                  Dev Dependencies
-                </StickySubHead>
-              </Trow>
-            ) : null}
-            {comparisonDataD &&
-              Object.values(comparisonDataD).map((item, index) => {
-                return (
-                  <Trow key={`tr_${index}`}>
-                    <Tcell>{Object.keys(comparisonDataD)[index]}</Tcell>
-                    <Tcell
-                      $active={
-                        item.pkgNewVer
-                          ? versionComparison(item.pkgCurrVer, item.pkgNewVer)
-                          : ""
-                      }
-                    >
-                      {item.pkgCurrVer}
-                    </Tcell>
-                    <Tcell>
-                      {item.pkgNewVer ? item.pkgNewVer : <Loader></Loader>}
-                    </Tcell>
-                    {/*<Tcell>
-				  			  		{
-				  			  			item.pkgDependencies && Object.keys(item.pkgDependencies).map((item2, index2) => {
-				  			  				return (
-				  			  					<span>{ item2 }</span>
-				  			  				)
-				  							})
-				  			  		}
-				  			  	</Tcell>*/}
-                  </Trow>
-                );
-              })}
-          </tbody>
-        </Table>
-      </TableWrapper>
-      <Legends>
-        <LegendsItem>Latest Version</LegendsItem>
-        <LegendsItem>Patch Update</LegendsItem>
-        <LegendsItem>Minor Update</LegendsItem>
-        <LegendsItem>Major Update</LegendsItem>
-      </Legends>
+      <TableData
+        sortAlpha={() =>
+          sortAlpha({
+            sortedAlpha,
+            comparisonData,
+            comparisonDataD,
+            setComparisonData,
+            trackerStatus,
+            setComparisonDataD,
+            setToggleAlphaSort,
+          })
+        }
+        sortedAlpha={sortedAlpha}
+        trackerStatus={trackerStatus}
+        calculatedDepData={calculatedDepData}
+        calculatedDevDepData={calculatedDevDepData}
+        versionComparison={versionComparison}
+      />
+      <VersionInfo filterByVersion={filterByVersion} isFiltered={isFiltered} />
     </Section>
   );
 }
