@@ -5,8 +5,8 @@ import { Section } from "../assets/Comparison.styled";
 import { versionComparison } from "../utils/versionComparision";
 import { VersionInfo } from "./VersionInfo";
 import { TableData } from "./TableData";
-import { fetchPackageDetails } from "../utils/fetchPackageDetails";
 import { sortAlpha } from "../utils/sortAlpha";
+import { UseFetchPackages } from "../api/UseFetchPackages";
 
 function Comparison() {
   const location = useLocation();
@@ -94,15 +94,13 @@ function Comparison() {
     loadExistingData();
   }, [pkgData]);
 
-  useEffect(() => {
-    fetchPackageDetails({
-      pkgData,
-      setComparisonData,
-      setComparisonDataD,
-      trackerStatus,
-      versionComparison,
-    });
-  }, [trackerStatus]);
+  UseFetchPackages({
+    pkgData,
+    setComparisonData,
+    setComparisonDataD,
+    trackerStatus,
+    versionComparison,
+  });
 
   const calculatedDepData =
     isFiltered && filteredData ? filteredData : comparisonData;

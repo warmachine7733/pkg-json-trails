@@ -1,22 +1,20 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createGlobalStyle, styled } from "styled-components";
 
-import {
-  createBrowserRouter,
-  RouterProvider
-} from 'react-router-dom';
-import { createGlobalStyle, styled } from 'styled-components';
-
-import App from './components/App';
-import Comparison from './components/Comparison';
-import { colors, fonts } from './utils/constants';
+import App from "./components/App";
+import Comparison from "./components/Comparison";
+import { colors, fonts } from "./utils/constants";
 
 const routerConfig = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-  }, {
+  },
+  {
     path: "/comparison",
     element: <Comparison />,
-  }
+  },
 ]);
 
 const GlobalStyle = createGlobalStyle`
@@ -69,16 +67,20 @@ const SubTitle = styled.h5`
   color: ${colors.darkGray};
 `;
 
+const queryClient = new QueryClient();
+
 function Router() {
   return (
-    <Main>
-      <GlobalStyle />
-      <Header>
-        <Title>Package Tracker</Title>
-        <SubTitle>Track your project's package version</SubTitle>
-      </Header>
-      <RouterProvider router={routerConfig} />
-    </Main>
+    <QueryClientProvider client={queryClient}>
+      <Main>
+        <GlobalStyle />
+        <Header>
+          <Title>Package Tracker</Title>
+          <SubTitle>Track your project's package version</SubTitle>
+        </Header>
+        <RouterProvider router={routerConfig} />
+      </Main>
+    </QueryClientProvider>
   );
 }
 
