@@ -49,11 +49,13 @@ export const TableData = ({
                 <Trow key={`tr_${index}`}>
                   <Tcell>
                     <StyledLink
-                      to={`${NPM_PACKAGE_URL}${item.pkgName}`}
+                      to={`${NPM_PACKAGE_URL}${
+                        Object.keys(calculatedDepData)[index]
+                      }`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {item.pkgName}
+                      {Object.keys(calculatedDepData)[index]}
                     </StyledLink>
                   </Tcell>
                   <Tcell
@@ -78,7 +80,17 @@ export const TableData = ({
             Object.values(calculatedDevDepData).map((item, index) => {
               return (
                 <Trow key={`tr_${index}`}>
-                  <Tcell>{Object.keys(calculatedDevDepData)[index]}</Tcell>
+                  <Tcell>
+                    <StyledLink
+                      to={`${NPM_PACKAGE_URL}${
+                        Object.keys(calculatedDevDepData)[index]
+                      }`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {Object.keys(calculatedDevDepData)[index]}
+                    </StyledLink>
+                  </Tcell>
                   <Tcell
                     $active={item.pkgNewVer ? item.versionDetails.color : ""}
                   >
