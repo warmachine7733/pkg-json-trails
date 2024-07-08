@@ -19,6 +19,4 @@ export const UseFetchPackages = ({
         versionComparison,
       }),
   });
-
-  console.log(data, isPending, error);
 };

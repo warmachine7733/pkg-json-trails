@@ -4,6 +4,7 @@ import {
   StyledAsc,
   StyledDsc,
   StyledThCellOne,
+  StyledLink,
   TableWrapper,
   Table,
   Trow,
@@ -11,7 +12,7 @@ import {
   Tcell,
   Loader,
 } from "../assets/Comparison.styled";
-
+import { NPM_PACKAGE_URL } from "../constants";
 export const TableData = ({
   sortAlpha,
   sortedAlpha,
@@ -46,7 +47,15 @@ export const TableData = ({
             Object.values(calculatedDepData).map((item, index) => {
               return (
                 <Trow key={`tr_${index}`}>
-                  <Tcell>{Object.keys(calculatedDepData)[index]}</Tcell>
+                  <Tcell>
+                    <StyledLink
+                      to={`${NPM_PACKAGE_URL}${item.pkgName}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.pkgName}
+                    </StyledLink>
+                  </Tcell>
                   <Tcell
                     $active={item.pkgNewVer ? item.versionDetails.color : ""}
                   >

@@ -6,6 +6,7 @@ import {
   AiOutlineSortAscending,
   AiOutlineSortDescending,
 } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 const Section = styled.section`
   display: flex;
@@ -165,6 +166,10 @@ const StickySubHead = styled(Tcell)`
   z-index: 10 !important;
   top: 63px;
 `;
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: #3e3e97;
+`;
 
 export {
   Section,
@@ -173,6 +178,7 @@ export {
   StyledAsc,
   StyledDsc,
   StyledThCellOne,
+  StyledLink,
   TableWrapper,
   Table,
   Trow,
