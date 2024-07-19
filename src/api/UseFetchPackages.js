@@ -10,6 +10,7 @@ export const UseFetchPackages = ({
 }) => {
   const { isPending, error, data } = useQuery({
     queryKey: ["fetchPackageData"],
+    staleTime: Infinity,
     queryFn: async () =>
       await fetchPackageDetails({
         pkgData,
