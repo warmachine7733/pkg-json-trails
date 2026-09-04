@@ -3,6 +3,8 @@ const path = require("path");
 
 const SRC_DIR = path.resolve("src");
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 module.exports = {
   module: {
     rules: [
@@ -13,7 +15,7 @@ module.exports = {
         exclude: /node_modules/,
         options: {
           presets: ["@babel/preset-env", "@babel/preset-react"],
-          plugins: [require.resolve("react-refresh/babel")],
+          plugins: isDevelopment ? [require.resolve("react-refresh/babel")] : [],
         },
       },
       {
