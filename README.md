@@ -18,3 +18,9 @@ You can paste or upload a `package.json`, include `devDependencies`, search and 
 ```bash
 npm run build
 ```
+
+## Next
+
+- Send reports directly from the webpage through a secure email service.
+- Create a polished HTML email template with update summaries, severity colors, and package links.
+- Add a `How to fix` action for each outdated package that generates an upgrade plan with the recommended command, risk level, and affected version.
