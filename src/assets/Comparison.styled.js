@@ -8,7 +8,7 @@ const ResultsHeader = styled.div`display: flex; justify-content: space-between; 
 const ResultsTitle = styled.h2`color: ${colors.ink}; font-size: clamp(1.7rem, 4vw, 2.6rem); letter-spacing: -0.04em;`;
 const ResultsMeta = styled.p`margin-top: 0.3rem; color: ${colors.muted}; font-size: 0.9rem;`;
 const BackLink = styled(Link)`color: ${colors.darkGray}; font-size: 0.85rem; font-weight: 800; text-decoration: none; &:hover { color: ${colors.primaryDark}; }`;
-const Status = styled.p`margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 0.6rem; color: ${colors.muted}; background: ${colors.primarySoft}; font-size: 0.9rem;`;
+const Status = styled.div`margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 0.6rem; color: ${colors.muted}; background: ${colors.primarySoft}; font-size: 0.9rem;`;
 const ErrorStatus = styled(Status)`color: ${colors.error}; background: #fae8e6;`;
 const ProgressTrack = styled.div`height: 0.35rem; overflow: hidden; margin: 0.75rem 0 1.25rem; border-radius: 1rem; background: ${colors.line};`;
 const ProgressValue = styled.div`width: ${(props) => `${props.$value}%`}; height: 100%; border-radius: inherit; background: ${colors.primaryDark}; transition: width 200ms ease;`;
