@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
 const SRC_DIR = path.resolve("src");
@@ -31,6 +32,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new CopyPlugin({
+      patterns: [{ from: "public/favicon.svg", to: "favicon.svg" }],
+    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
       // favicon: "./public/favicon.ico",
